@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BuildCalc | Renovation & Construction Cost Estimator</title>
+<meta name="description" content="Estimate renovation and construction costs: cement, steel, tiles, paint quantities and total budget by finish level.">
+<link rel="canonical" href="https://aoodiakdiro0001-ops.github.io/buildcalc/">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0d0f14">
+<meta property="og:type" content="website">
+<meta property="og:title" content="BuildCalc | Construction Cost Calculator">
+<meta property="og:description" content="Materials + labor estimate in seconds.">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Consolas,monospace}
+:root{--bg:#0d0f14;--panel:#151b2e;--line:#2a3557;--grn:#34d399;--gold:#fbbf24;--blu:#60a5fa;--txt:#e0e6f2;--mut:#8b98b8;--org:#fb923c}
+body{background:var(--bg);color:var(--txt)}
+header{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.logo{font-size:22px;font-weight:900;color:var(--org)}
+.logo small{display:block;font-size:11px;color:var(--mut);font-weight:400}
+header select{margin-left:auto;background:var(--panel);color:var(--txt);border:1px solid var(--line);border-radius:14px;padding:7px 10px;font-size:13px}
+.tabs{display:flex;gap:6px;padding:14px 16px 0;flex-wrap:wrap;max-width:1100px;margin:0 auto}
+.tabs button{background:var(--panel);color:var(--txt);border:1px solid var(--line);border-bottom:none;padding:10px 16px;border-radius:12px 12px 0 0;cursor:pointer;font-weight:800;font-size:13px}
+.tabs button.on{background:#1e2749;color:var(--org)}
+main{max-width:1100px;margin:0 auto;padding:18px 15px 60px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:0 14px 14px 14px;padding:22px;display:none}
+.panel.on{display:block}
+.panel h2{color:var(--org);margin-bottom:6px;font-size:19px}
+.panel p.sub{color:var(--mut);font-size:13px;margin-bottom:12px;line-height:1.7}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}}
+.box{background:#0d0f14;border:1px solid var(--line);border-radius:14px;padding:16px}
+.box h3{font-size:14px;color:var(--blu);margin-bottom:10px}
+label.fl{display:block;font-size:12.5px;color:var(--mut);margin:8px 0 3px}
+input[type=text],input[type=number],select{background:#0d0f14;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:10px 13px;font-size:14px;outline:none;width:100%}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;align-items:center}
+button.go{background:var(--org);color:#1c0e03;border:none;padding:11px 26px;border-radius:10px;font-weight:900;cursor:pointer;font-size:14px}
+button.alt{background:transparent;color:var(--blu);border:1px solid var(--blu);padding:9px 16px;border-radius:10px;cursor:pointer;font-size:13px}
+.res{background:#0d0f14;border:1px solid var(--line);border-radius:12px;padding:14px;margin:10px 0;font-size:14px;line-height:2}
+.res b.big{font-size:22px;color:var(--gold)}
+table.bt{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px}
+table.bt th,table.bt td{border-bottom:1px solid var(--line);padding:8px 7px;text-align:left}
+table.bt th{color:var(--org);font-size:12px}
+table.bt td.n{text-align:right;font-variant-numeric:tabular-nums}
+.affgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:10px}
+.aff{background:#0d0f14;border:1px solid var(--line);border-radius:14px;padding:16px;text-align:center;font-size:13px}
+.aff b{display:block;font-size:15px;margin-bottom:4px}
+.aff small{color:var(--mut);display:block;margin-bottom:10px}
+.aff a{background:var(--grn);color:#06281c;font-weight:800;text-decoration:none;font-size:13px;padding:9px 20px;border-radius:12px;display:inline-block}
+.refbadge{font-size:10px;font-weight:900;background:var(--gold);color:#231a03;border-radius:8px;padding:2px 7px;margin-left:6px}
+.note{background:#1e2749;border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:12.5px;color:var(--mut);margin:10px 0;line-height:1.7}
+.donate{background:linear-gradient(135deg,#1e2749,#0e2a1d);border:1px solid var(--grn);border-radius:16px;padding:20px;text-align:center;margin-top:8px;font-size:13px}
+.donate .addr{background:#0d0f14;border-radius:10px;padding:10px;font-family:monospace;font-size:12px;word-break:break-all;direction:ltr;margin:6px auto;color:var(--grn);max-width:560px}
+.hist{border:1px solid var(--line);border-radius:12px;padding:12px;margin:8px 0;font-size:13px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.adslot{max-width:1100px;margin:12px auto 0;padding:0 15px;text-align:center}
+.adslot .ph{display:block;border:1px dashed var(--line);border-radius:10px;color:var(--mut);font-size:12px;padding:10px}
+footer{text-align:center;color:var(--mut);font-size:12.5px;padding:26px 16px;border-top:1px solid var(--line);line-height:2}
+footer a{color:var(--grn)}
+#toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:12px 25px;border-radius:25px;z-index:200;display:none;font-size:14px;max-width:92vw;text-align:center}
+@media print{body>*{display:none!important}#printArea{display:block!important;color:#000}#printArea table{width:100%;border-collapse:collapse}#printArea td,#printArea th{border:1px solid #999;padding:6px;font-size:12px}}
+#printArea{display:none}
+</style>
+</head>
+<body>
+<header>
+<div class="logo">🏗️ BuildCalc<small data-i="tag"></small></div>
+<select id="langSel" onchange="setLang(this.value)">
+<option value="en" selected>🇬🇧 English</option><option value="tr">🇹🇷 Türkçe</option><option value="ar">🇸🇦 العربية</option>
+</select>
+</header>
+<div class="tabs" id="tabs"></div>
+<main>
+<section class="panel on" id="p-calc">
+<h2 data-i="cT"></h2><p class="sub" data-i="cS"></p>
+<div class="grid2">
+<div class="box"><h3 data-i="inT"></h3>
+<label class="fl" data-i="fKind"></label><select id="cKind"><option value="reno" data-i="kReno"></option><option value="new" data-i="kNew"></option></select>
+<label class="fl" data-i="fArea"></label><input type="number" id="cArea" value="100" step="any">
+<label class="fl" data-i="fFin"></label><select id="cFin"><option value="0" data-i="f0"></option><option value="1" data-i="f1" selected></option><option value="2" data-i="f2"></option><option value="3" data-i="f3"></option></select>
+<label class="fl" data-i="fRooms"></label><input type="number" id="cRooms" value="3" step="1">
+<label class="fl" data-i="fBaths"></label><input type="number" id="cBaths" value="1" step="1">
+<label class="fl" data-i="fCity"></label><select id="cCity"><option value="1.15" data-i="cityI"></option><option value="1.05" data-i="cityA"></option><option value="1" data-i="cityO" selected></option></select>
+<label class="fl" data-i="fCur"></label><select id="cCur"><option value="TRY">₺ TRY</option><option value="USD">$ USD</option><option value="EUR">€ EUR</option></select>
+<div class="row"><button class="go" onclick="calc()" data-i="btnCalc"></button><button class="alt" onclick="saveEst()" data-i="btnSave"></button><button class="alt" onclick="printEst()" data-i="btnPrint"></button></div>
+</div>
+<div class="box"><h3 data-i="outT"></h3><div id="calcRes">—</div></div>
+</div>
+<div class="note" data-i="estNote"></div>
+</section>
+<section class="panel" id="p-hist">
+<h2 data-i="hT"></h2><p class="sub" data-i="hS"></p>
+<div id="histList"></div>
+</section>
+<section class="panel" id="p-aff">
+<h2 data-i="aT"></h2><p class="sub" data-i="aS"></p>
+<div class="affgrid" id="affGrid"></div>
+</section>
+<section class="panel" id="p-donate">
+<h2 data-i="doT"></h2><p class="sub" data-i="doS"></p>
+<div class="donate">
+<div>₿ BTC</div><div class="addr" id="btcA"></div>
+<div>₮ USDT-TRC20</div><div class="addr" id="usdtA"></div>
+<div class="row" style="justify-content:center"><button class="alt" onclick="copyTxt(document.getElementById('btcA').textContent)" data-i="btnCopy"></button></div>
+<div style="font-size:12.5px">🏦 Baran Avisat — TRY: <code dir="ltr">TR10 0001 0090 1008 4013 0050 01</code></div>
+<div style="font-size:12.5px">🏦 Baran Avisat — USD: <code dir="ltr">TR80 0001 0090 1008 4013 0050 02</code></div>
+</div>
+</section>
+</main>
+<div id="printArea"></div>
+<div class="adslot" id="adFoot"><span class="ph" data-i="adHere" style="display:block;border:1px dashed var(--line);border-radius:10px;color:var(--mut);font-size:12px;padding:10px"></span></div>
+<footer><span data-i="foot"></span><br>📧 <a href="mailto:baranavisat@gmail.com">baranavisat@gmail.com</a> · 📞 <a href="tel:+905313263722" dir="ltr">+90 531 326 37 22</a> · <a href="https://wa.me/905313263722" target="_blank" rel="noopener">WhatsApp</a><br><a href="README.md" target="_blank">README</a> · MIT</footer>
+<div id="toast"></div>
+<script>
+const CONFIG={ads:{client:'',slot:'',carbonServe:'',carbonPlacement:''},
+pay:{btc:'bc1q8dhtdrndxsl70e97t8grydfe6pjue37zrhzf6c',usdt:'TLWdTjqqogkXNEXGiPWsGdjFP6ioycxeWW'},
+fx:{TRY:1,USD:49.26,EUR:53.4},
+aff:{kocatas:'',bauhaus:'',ikea:'',trendyol:'',hepsiburada:''}};
+const FINISH=[
+{q:{tile:[0.4,0.6,0.8,0.9],tileP:[450,650,950,1400],lamP:[350,500,750,1100],paintP:[180,240,320,450],doorP:[8000,12000,18000,28000],entP:[25000,35000,50000,80000],winP:[12000,16000,22000,35000],kitP:[25000,40000,65000,100000],bathP:[30000,50000,90000,150000],elP:[1500,2000,2800,4000],plP:[2500,3500,5000,7500],cem:[0.6,0.8,1.0,1.2]}}][0].q;
+const PRICE={cementBag:260,sandM3:900,gravelM3:1100,concreteM3:2800,steelTon:30000,brickPc:12,laborPct:35,contPct:10};
+const AFFS=[
+{k:'kocatas',n:'Koçtaş',d:'Yapı market & dekorasyon',u:'https://www.kocatas.com.tr'},
+{k:'bauhaus',n:'Bauhaus',d:'Hırdavat & yapı',u:'https://www.bauhaus.com.tr'},
+{k:'ikea',n:'IKEA',d:'Mobilya & ev',u:'https://www.ikea.com.tr'},
+{k:'trendyol',n:'Trendyol Ev',d:'Ev aksesuarları',u:'https://www.trendyol.com'},
+{k:'hepsiburada',n:'Hepsiburada Yapı',d:'Alet & hırdavat',u:'https://www.hepsiburada.com'}];
+const T={
+en:{tag:'Renovation & construction cost estimator',tabC:'🏗️ Calculator',tabH:'📚 Estimates',tabA:'🛒 Materials',tabDo:'💚 Donate',
+cT:'🏗️ Cost Estimator',cS:'Area + finish + rooms → materials, labor and total budget in seconds. Estimates only — always get contractor quotes.',
+inT:'Inputs',outT:'Estimate',fKind:'Project',kReno:'Renovation',kNew:'New build',fArea:'Area (m²)',fFin:'Finish level',f0:'Economy',f1:'Standard',f2:'Deluxe',f3:'Super deluxe',fRooms:'Rooms',fBaths:'Bathrooms',fCity:'City factor',cityI:'Istanbul ×1.15',cityA:'Ankara/İzmir ×1.05',cityO:'Other ×1.0',fCur:'Currency',btnCalc:'Calculate',btnSave:'Save',btnPrint:'Print',
+estNote:'Rule-of-thumb quantities with waste included. Prices: indicative 2026 TRY market. Get 3 contractor quotes before committing.',
+hT:'📚 Saved Estimates',hS:'Stored in this browser only.',
+aT:'🛒 Materials & Maintenance',aS:'Tools, accessories and services. REF marks our affiliate links — same price for you.',
+doT:'💚 Support BuildCalc',doS:'Free forever. Donations keep rates updated.',
+btnCopy:'Copy',adHere:'Contractor & decor ads here (high CPC)',foot:'BuildCalc — free estimator. Estimates, not quotes.',
+copied:'Copied ✅',needNum:'Enter a valid area ⚠️',saved:'Saved ✅',cleared:'Cleared ✅',
+uBag:'bags (50kg)',uM3:'m³',uTon:'t',uPc:'pcs',uM2:'m²',uL:'L',uM:'m',uSet:'sets',uPts:'pts',
+mCem:'Cement',mSand:'Sand',mGrav:'Gravel',mConc:'Concrete C25',mSteel:'Rebar steel',mBrick:'Bricks',mTile:'Ceramic tiles',mLam:'Laminate floor',mPaint:'Paint (+primer)',mDoor:'Interior doors',mEnt:'Entrance door',mWin:'Windows (PVC)',mKit:'Kitchen (per m)',mBath:'Bathroom set',mEl:'Electrical points',mPl:'Plumbing points',
+rMat:'Materials',rLab:'Labor (35%)',rSub:'Subtotal',rCont:'Contingency (10%)',rTot:'TOTAL',rM2:'per m²',rTime:'est. duration',wks:'weeks',kitM:'countertop'},
+tr:{tag:'Tadilat & inşaat maliyet hesaplayıcı',tabC:'🏗️ Hesaplayıcı',tabH:'📚 Hesaplar',tabA:'🛒 Malzeme',tabDo:'💚 Destek',
+cT:'🏗️ Maliyet Tahminleyici',cS:'Alan + finisaj + oda → saniyeler içinde malzeme, işçilik ve toplam bütçe. Tahminidir — mutlaka usta teklifi alın.',
+inT:'Girdiler',outT:'Tahmin',fKind:'Proje',kReno:'Tadilat',kNew:'Yeni bina',fArea:'Alan (m²)',fFin:'Finisaj',f0:'Ekonomik',f1:'Standart',f2:'Delüks',f3:'Süper delüks',fRooms:'Oda',fBaths:'Banyo',fCity:'Şehir katsayısı',cityI:'İstanbul ×1,15',cityA:'Ankara/İzmir ×1,05',cityO:'Diğer ×1,0',fCur:'Para birimi',btnCalc:'Hesapla',btnSave:'Kaydet',btnPrint:'Yazdır',
+estNote:'Fire paylı yaklaşık metrajlar. Fiyatlar gösterge 2026 TRY piyasasıdır. Karar öncesi 3 teklif alın.',
+hT:'📚 Kayıtlı Hesaplar',hS:'Yalnızca bu tarayıcıda.',
+aT:'🛒 Malzeme & Bakım',aS:'Alet, aksesuar ve servisler. REF bağlantılar bize kazandırır, size aynı fiyat.',
+doT:'💚 Destekle',doS:'Sonsuza dek ücretsiz. Bağışlar fiyatları güncel tutar.',
+btnCopy:'Kopyala',adHere:'Müteahhit & dekorasyon reklamları burada (yüksek CPC)',foot:'BuildCalc — ücretsiz tahminleyici. Tahmindir, teklif değildir.',
+copied:'Kopyalandı ✅',needNum:'Geçerli alan girin ⚠️',saved:'Kaydedildi ✅',cleared:'Silindi ✅',
+uBag:'torba (50kg)',uM3:'m³',uTon:'ton',uPc:'adet',uM2:'m²',uL:'lt',uM:'m',uSet:'takım',uPts:'nokta',
+mCem:'Çimento',mSand:'Kum',mGrav:'Çakıl',mConc:'Beton C25',mSteel:'İnşaat demiri',mBrick:'Tuğla',mTile:'Seramik',mLam:'Laminat parke',mPaint:'Boya (+astar)',mDoor:'İç kapılar',mEnt:'Çelik kapı',mWin:'Pencereler (PVC)',mKit:'Mutfak (metre)',mBath:'Banyo takımı',mEl:'Elektrik noktaları',mPl:'Su tesisat noktaları',
+rMat:'Malzeme',rLab:'İşçilik (%35)',rSub:'Ara toplam',rCont:'Pay (%10)',rTot:'TOPLAM',rM2:'m² başına',rTime:'tahmini süre',wks:'hafta',kitM:'tezgah'},
+ar:{tag:'حاسبة تكاليف البناء والتشطيب',tabC:'🏗️ الحاسبة',tabH:'📚 التقديرات',tabA:'🛒 مواد',tabDo:'💚 ادعم',
+cT:'🏗️ مقدّر التكاليف',cS:'المساحة + التشطيب + الغرف ← المواد والعمالة والإجمالي بثوانٍ. تقديرات — اطلب عروض مقاولين.',
+inT:'المدخلات',outT:'التقدير',fKind:'المشروع',kReno:'ترميم',kNew:'بناء جديد',fArea:'المساحة (م²)',fFin:'التشطيب',f0:'اقتصادي',f1:'عادي',f2:'ديلوكس',f3:'سوبر ديلوكس',fRooms:'الغرف',fBaths:'الحمامات',fCity:'معامل المدينة',cityI:'إسطنبول ×1.15',cityA:'أنقرة/إزمير ×1.05',cityO:'أخرى ×1.0',fCur:'العملة',btnCalc:'احسب',btnSave:'احفظ',btnPrint:'اطبع',
+estNote:'كميات تقريبية تشمل الهالك. الأسعار استرشادية 2026. خذ 3 عروض قبل القرار.',
+hT:'📚 التقديرات المحفوظة',hS:'في هذا المتصفح فقط.',
+aT:'🛒 مواد وصيانة',aS:'عدد وإكسسوارات وخدمات. روابط REF تكسبنا بنفس السعر لك.',
+doT:'💚 ادعم BuildCalc',doS:'مجاني للأبد. التبرعات تُبقي الأسعار محدثة.',
+btnCopy:'نسخ',adHere:'إعلانات المقاولات والديكور هنا',foot:'BuildCalc — مقدّر مجاني. تقديرات وليست عروضاً.',
+copied:'تم ✅',needNum:'أدخل مساحة صالحة ⚠️',saved:'حُفظ ✅',cleared:'مُسح ✅',
+uBag:'كيس (50كغ)',uM3:'م³',uTon:'طن',uPc:'قطعة',uM2:'م²',uL:'لتر',uM:'م',uSet:'طقم',uPts:'نقطة',
+mCem:'أسمنت',mSand:'رمل',mGrav:'حصى',mConc:'خرسانة',mSteel:'حديد تسليح',mBrick:'طوب',mTile:'سيراميك',mLam:'باركيه',mPaint:'دهان',mDoor:'أبواب داخلية',mEnt:'باب رئيسي',mWin:'نوافذ',mKit:'مطبخ (متر)',mBath:'طقم حمام',mEl:'نقاط كهرباء',mPl:'نقاط سباكة',
+rMat:'المواد',rLab:'العمالة (35%)',rSub:'المجموع الفرعي',rCont:'احتياطي (10%)',rTot:'الإجمالي',rM2:'للمتر',rTime:'المدة',wks:'أسابيع',kitM:'سطح'}};
+let lang='en',curEst=null;
+const t=k=>(T[lang]&&T[lang][k])||T.en[k]||k;
+function setLang(v){lang=v;document.documentElement.lang=v;document.documentElement.dir=(v==='ar')?'rtl':'ltr';document.getElementById('langSel').value=v;
+document.querySelectorAll('[data-i]').forEach(e=>{e.textContent=t(e.dataset.i);});
+buildTabs();renderAff();renderHist();renderDonate();}
+const TABS=[['calc','tabC'],['hist','tabH'],['aff','tabA'],['donate','tabDo']];
+function buildTabs(){document.getElementById('tabs').innerHTML=TABS.map(x=>`<button id="tab-${x[0]}" onclick="tab('${x[0]}')">${t(x[1])}</button>`).join('');document.getElementById('tab-calc').classList.add('on');}
+function tab(w){TABS.forEach(x=>{const b=document.getElementById('tab-'+x[0]);if(b)b.classList.toggle('on',w===x[0]);document.getElementById('p-'+x[0]).classList.toggle('on',w===x[0]);});}
+function toast(m){let d=document.getElementById('toast');d.textContent=m;d.style.display='block';clearTimeout(d._h);d._h=setTimeout(()=>d.style.display='none',2200);}
+function copyTxt(x){try{if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(x);}catch(e){}toast(t('copied'));}
+function num(id,d){const v=parseFloat((document.getElementById(id)||{}).value);return isNaN(v)?(d||0):v;}
+function estimate(o){
+const F=FINISH,q=F;
+const wet=o.baths*14+12;
+const tileFrac=q.tile[o.f],tileA=(o.area*tileFrac+wet)*1.10;
+const lamA=Math.max(0,o.area*(1-tileFrac))*1.08;
+const wallA=o.area*2.6*0.92;
+const paintL=(wallA/10*2+o.area/12*2)*1.05;
+const doors=o.rooms,win=o.rooms+1;
+const kitM=3.5,elPts=o.rooms*8+o.baths*4,plPts=o.baths*5+4;
+const it=[];
+it.push({k:'mCem',q:o.area*q.cem[o.f],u:'uBag',p:PRICE.cementBag});
+it.push({k:'mSand',q:o.area*0.06,u:'uM3',p:PRICE.sandM3});
+it.push({k:'mGrav',q:o.area*0.04,u:'uM3',p:PRICE.gravelM3});
+if(o.kind==='new'){
+it.push({k:'mConc',q:o.area*0.4,u:'uM3',p:PRICE.concreteM3});
+it.push({k:'mSteel',q:o.area*45/1000,u:'uTon',p:PRICE.steelTon});
+it.push({k:'mBrick',q:o.area*55,u:'uPc',p:PRICE.brickPc});
+}
+it.push({k:'mTile',q:tileA,u:'uM2',p:q.tileP[o.f]});
+it.push({k:'mLam',q:lamA,u:'uM2',p:q.lamP[o.f]});
+it.push({k:'mPaint',q:paintL,u:'uL',p:q.paintP[o.f]});
+it.push({k:'mDoor',q:doors,u:'uPc',p:q.doorP[o.f]});
+it.push({k:'mEnt',q:1,u:'uPc',p:q.entP[o.f]});
+it.push({k:'mWin',q:win,u:'uPc',p:q.winP[o.f]});
+it.push({k:'mKit',q:kitM,u:'uM',p:q.kitP[o.f]});
+it.push({k:'mBath',q:o.baths,u:'uSet',p:q.bathP[o.f]});
+it.push({k:'mEl',q:elPts,u:'uPts',p:q.elP[o.f]});
+it.push({k:'mPl',q:plPts,u:'uPts',p:q.plP[o.f]});
+let mat=0;it.forEach(x=>{x.cost=x.q*x.p;mat+=x.cost;});
+const lab=mat*PRICE.laborPct/100,sub=mat+lab,cont=sub*PRICE.contPct/100;
+const tot=(sub+cont)*o.city;
+const weeks=Math.max(2,Math.round(o.area/12+(o.kind==='new'?10:0)));
+return {items:it,mat,lab,sub,cont,tot,m2:tot/o.area,weeks};
+}
+function fmt(n,cur){const r=CONFIG.fx[cur]||1;const v=n/r;const s=v>=100?Math.round(v).toLocaleString('en-US'):v.toFixed(0);const sym={TRY:'₺',USD:'$',EUR:'€'}[cur]||'';return s+' '+sym;}
+function calc(){
+const o={kind:document.getElementById('cKind').value,area:num('cArea'),f:+document.getElementById('cFin').value||0,rooms:Math.max(0,Math.round(num('cRooms'))),baths:Math.max(0,Math.round(num('cBaths'))),city:num('cCity',1),cur:document.getElementById('cCur').value};
+if(!(o.area>0)){toast(t('needNum'));return;}
+const r=estimate(o);curEst={o,r,time:new Date().toLocaleString()};
+const rows=r.items.map(x=>`<tr><td>${t(x.k)}</td><td class="n">${x.q>=100?Math.round(x.q).toLocaleString('en-US'):x.q.toFixed(1)} ${t(x.u)}</td><td class="n">${fmt(x.cost,o.cur)}</td></tr>`).join('');
+document.getElementById('calcRes').innerHTML=`<table class="bt">${rows}<tr><td><b>${t('rMat')}</b></td><td></td><td class="n"><b>${fmt(r.mat,o.cur)}</b></td></tr><tr><td>${t('rLab')}</td><td></td><td class="n">${fmt(r.lab,o.cur)}</td></tr><tr><td>${t('rSub')}</td><td></td><td class="n">${fmt(r.sub,o.cur)}</td></tr><tr><td>${t('rCont')}</td><td></td><td class="n">${fmt(r.cont,o.cur)}</td></tr><tr><td><b>${t('rTot')}</b></td><td class="n">${t('rM2')}: ${fmt(r.m2,o.cur)}</td><td class="n"><b class="big">${fmt(r.tot,o.cur)}</b></td></tr></table><div class="note">⏱ ${t('rTime')}: ~${r.weeks} ${t('wks')}</div>`;
+return r;
+}
+function hist(){try{return JSON.parse(localStorage.getItem('bc_hist')||'[]');}catch(e){return [];}}
+function saveEst(){if(!curEst)calc();if(!curEst)return;try{const h=hist();h.unshift({o:curEst.o,tot:Math.round(curEst.r.tot),time:curEst.time});localStorage.setItem('bc_hist',JSON.stringify(h.slice(0,50)));}catch(e){}renderHist();toast(t('saved'));}
+function renderHist(){const h=hist();document.getElementById('histList').innerHTML=h.map((x,i)=>`<div class="hist"><b style="flex:1">${x.o.area}m² · ${t('f'+x.o.f)} · ${x.o.rooms}+${x.o.baths}</b><b>${Math.round(x.tot).toLocaleString('en-US')} ₺</b><small style="color:var(--mut)">${x.time||''}</small><button class="alt" style="padding:5px 12px;font-size:12px" onclick="delHist(${i})">❌</button></div>`).join('')||'<p style="color:var(--mut)">—</p>';}
+function delHist(i){try{const h=hist();h.splice(i,1);localStorage.setItem('bc_hist',JSON.stringify(h));}catch(e){}renderHist();}
+function printEst(){if(!curEst)calc();if(!curEst)return;const r=curEst.r,o=curEst.o;
+document.getElementById('printArea').innerHTML=`<h2>BuildCalc — ${o.area}m²</h2><table>${r.items.map(x=>`<tr><td>${t(x.k)}</td><td>${x.q.toFixed(1)} ${t(x.u)}</td><td>${Math.round(x.cost).toLocaleString('en-US')} ₺</td></tr>`).join('')}<tr><td><b>TOTAL</b></td><td></td><td><b>${Math.round(r.tot).toLocaleString('en-US')} ₺</b></td></tr></table>`;window.print();}
+function affFor(k){const a=AFFS.find(x=>x.k===k);return (CONFIG.aff&&CONFIG.aff[k])||(a?a.u:'#');}
+function isAff(k){return !!(CONFIG.aff&&CONFIG.aff[k]);}
+function renderAff(){
+document.getElementById('affGrid').innerHTML=AFFS.map(a=>`<div class="aff"><b>${a.n}${isAff(a.k)?'<span class="refbadge">REF</span>':''}</b><small>${a.d}</small><br><a target="_blank" rel="nofollow sponsored noopener" href="${affFor(a.k)}">→</a></div>`).join('');
+}
+function renderDonate(){
+document.getElementById('btcA').textContent=CONFIG.pay.btc;
+document.getElementById('usdtA').textContent=CONFIG.pay.usdt;
+}
+function loadAds(){const A=CONFIG.ads,el=document.getElementById('adFoot');if(!el)return;
+if(A.client){el.innerHTML='<ins class="adsbygoogle" style="display:block" data-ad-client="'+A.client+'" data-ad-slot="'+(A.slot||'')+'" data-ad-format="auto"></ins>';
+if(!document.querySelector('script[src*="adsbygoogle"]')){const s=document.createElement('script');s.async=true;s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client='+A.client;s.crossOrigin='anonymous';document.head.appendChild(s);}try{(window.adsbygoogle=window.adsbygoogle||[]).push({});}catch(e){}}
+else if(A.carbonServe){el.innerHTML='';const s=document.createElement('script');s.async=true;s.id='_carbonads_js';s.src='//cdn.carbonads.com/carbon.js?serve='+A.carbonServe+'&placement='+A.carbonPlacement;el.appendChild(s);}}
+setLang('en');loadAds();renderDonate();
+</script>
+</body>
+</html>
